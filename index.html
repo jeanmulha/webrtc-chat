@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat WebRTC - GitHub Pages</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            width: 100%;
+            max-width: 900px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #4a00e0 0%, #8e2de2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        
+        .github-info {
+            background: #f1f8ff;
+            color: #0366d6;
+            padding: 8px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 0.8rem;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 500px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .connection-panel {
+            background: #f8f9fa;
+            padding: 20px;
+            border-right: 1px solid #e9ecef;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-panel {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .section-title {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            border-bottom: 2px solid #4a00e0;
+            padding-bottom: 8px;
+        }
+        
+        .config-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #495057;
+            font-weight: 500;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            resize: vertical;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 110px;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background: #4a00e0;
+            color: white;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background: #3a00b0;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover:not(:disabled) {
+            background: #218838;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover:not(:disabled) {
+            background: #c82333;
+        }
+        
+        button:disabled {
+            background: #adb5bd;
+            cursor: not-allowed;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 12px;
+            border-radius: 6px;
+            background: #f8f9fa;
+            font-size: 0.9rem;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-disconnected {
+            background: #dc3545;
+        }
+        
+        .status-connecting {
+            background: #ffc107;
+        }
+        
+        .status-connected {
+            background: #28a745;
+        }
+        
+        .messages-container {
+            flex: 1;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px;
+            overflow-y: auto;
+            background: #fdfdfd;
+            margin-bottom: 12px;
+            min-height: 300px;
+        }
+        
+        .message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 15px;
+            max-width: 85%;
+            word-wrap: break-word;
+            font-size: 0.9rem;
+        }
+        
+        .message-sent {
+            background: #4a00e0;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .message-received {
+            background: #e9ecef;
+            color: #495057;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .message-system {
+            background: #fff3cd;
+            color: #856404;
+            margin: 0 auto;
+            text-align: center;
+            font-style: italic;
+            max-width: 90%;
+            font-size: 0.85rem;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 8px;
+        }
+        
+        #messageInput {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 20px;
+            outline: none;
+            font-size: 0.9rem;
+        }
+        
+        #messageInput:focus {
+            border-color: #4a00e0;
+        }
+        
+        .debug-panel {
+            background: #2d3748;
+            color: white;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 12px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            max-height: 120px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+        
+        .debug-item {
+            margin-bottom: 3px;
+        }
+        
+        .debug-success {
+            color: #68d391;
+        }
+        
+        .debug-error {
+            color: #fc8181;
+        }
+        
+        .debug-info {
+            color: #63b3ed;
+        }
+        
+        .instructions {
+            background: #e7f3ff;
+            border: 1px solid #b3d4fc;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 15px;
+            font-size: 0.8rem;
+        }
+        
+        .instructions-title {
+            font-weight: 600;
+            color: #004085;
+            margin-bottom: 5px;
+        }
+        
+        .instructions-text {
+            color: #004085;
+            line-height: 1.4;
+        }
+        
+        .name-display {
+            background: #4a00e0;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .copy-hint {
+            background: #d4edda;
+            color: #155724;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            margin-top: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Chat WebRTC - GitHub Pages</h1>
+            <div class="subtitle">Hébergé gratuitement sur GitHub</div>
+            <div class="github-info">
+                ✅ Compatible GitHub Pages - Aucun serveur nécessaire
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <div class="connection-panel">
+                <h3 class="section-title">Configuration de la Connexion</h3>
+                
+                <div class="config-group">
+                    <label>Votre nom :</label>
+                    <input type="text" id="userName" placeholder="Votre nom..." value="Utilisateur">
+                </div>
+                
+                <div class="config-group">
+                    <label>Nom de votre correspondant :</label>
+                    <input type="text" id="remoteUserName" placeholder="Nom reçu automatiquement..." readonly>
+                </div>
+                
+                <div class="config-group">
+                    <label>Votre Description Locale :</label>
+                    <textarea id="localSdp" readonly placeholder="Votre offre ou réponse apparaîtra ici..."></textarea>
+                    <div class="copy-hint">📋 Copiez ce texte et envoyez-le à votre correspondant</div>
+                </div>
+                
+                <div class="config-group">
+                    <label>Description Distante (à coller) :</label>
+                    <textarea id="remoteSdp" placeholder="Collez ici la description reçue de l'autre navigateur..."></textarea>
+                    <div class="copy-hint">📥 Collez le texte reçu de votre correspondant</div>
+                </div>
+                
+                <div class="button-group">
+                    <button id="createOffer" class="btn-primary">Créer une Offre</button>
+                    <button id="setAnswer" class="btn-success" disabled>Accepter la Réponse</button>
+                </div>
+                
+                <div class="status-indicator">
+                    <div class="status-dot status-disconnected"></div>
+                    <span id="statusText">Déconnecté</span>
+                </div>
+                
+                <div class="debug-panel" id="debugPanel">
+                    <div class="debug-item debug-info">Prêt à se connecter...</div>
+                </div>
+                
+                <div class="button-group">
+                    <button id="disconnectBtn" class="btn-danger" disabled>Déconnecter</button>
+                </div>
+                
+                <div class="instructions">
+                    <div class="instructions-title">📖 Instructions :</div>
+                    <div class="instructions-text">
+                        1. <strong>Utilisateur A</strong> : Créer une offre → Copier le texte<br>
+                        2. <strong>Utilisateur B</strong> : Coller l'offre → Créer une réponse → Copier<br>
+                        3. <strong>Utilisateur A</strong> : Coller la réponse<br>
+                        4. <strong>Les noms s'échangent automatiquement</strong><br>
+                        5. <strong>Chattez en temps réel !</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-panel">
+                <h3 class="section-title">💬 Chat en Temps Réel</h3>
+                
+                <div class="name-display" id="nameDisplay">
+                    En attente de connexion...
+                </div>
+                
+                <div class="messages-container" id="messagesContainer">
+                    <div class="message message-system">
+                        Bienvenue ! Établissez une connexion WebRTC pour commencer à chatter
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <input type="text" id="messageInput" placeholder="Connectez-vous d'abord..." disabled>
+                    <button id="sendBtn" class="btn-primary" disabled>Envoyer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class WebRTCChat {
+            constructor() {
+                this.peerConnection = null;
+                this.dataChannel = null;
+                this.isInitiator = false;
+                this.remoteSdpProcessed = false;
+                this.userName = "Utilisateur";
+                this.remoteUserName = "Correspondant";
+                this.nameExchanged = false;
+                
+                // Configuration optimisée pour GitHub Pages
+                this.configuration = {
+                    iceServers: [
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        { urls: 'stun:stun1.l.google.com:19302' },
+                        { urls: 'stun:stun2.l.google.com:19302' },
+                        { 
+                            urls: 'turn:relay.metered.ca:80',
+                            username: 'openai',
+                            credential: 'openai123'
+                        }
+                    ],
+                    iceCandidatePoolSize: 10
+                };
+                
+                this.initialize();
+            }
+            
+            initialize() {
+                this.userNameInput = document.getElementById('userName');
+                this.remoteUserNameInput = document.getElementById('remoteUserName');
+                this.localSdp = document.getElementById('localSdp');
+                this.remoteSdp = document.getElementById('remoteSdp');
+                this.createOfferBtn = document.getElementById('createOffer');
+                this.setAnswerBtn = document.getElementById('setAnswer');
+                this.disconnectBtn = document.getElementById('disconnectBtn');
+                this.messageInput = document.getElementById('messageInput');
+                this.sendBtn = document.getElementById('sendBtn');
+                this.messagesContainer = document.getElementById('messagesContainer');
+                this.statusText = document.getElementById('statusText');
+                this.statusDot = document.querySelector('.status-dot');
+                this.debugPanel = document.getElementById('debugPanel');
+                this.nameDisplay = document.getElementById('nameDisplay');
+                
+                this.setupEventListeners();
+                this.updateNameDisplay();
+                this.logDebug('✅ Application initialisée - Prête pour GitHub Pages', 'info');
+            }
+            
+            setupEventListeners() {
+                this.userNameInput.addEventListener('input', () => {
+                    this.userName = this.userNameInput.value.trim() || "Utilisateur";
+                    this.updateNameDisplay();
+                    if (this.dataChannel && this.dataChannel.readyState === 'open') {
+                        this.sendUserName();
+                    }
+                });
+                
+                this.createOfferBtn.addEventListener('click', () => this.startAsInitiator());
+                this.setAnswerBtn.addEventListener('click', () => this.handleRemoteDescription());
+                this.disconnectBtn.addEventListener('click', () => this.disconnect());
+                this.sendBtn.addEventListener('click', () => this.sendMessage());
+                
+                this.messageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.sendMessage();
+                });
+                
+                this.remoteSdp.addEventListener('input', () => {
+                    this.setAnswerBtn.disabled = !this.remoteSdp.value.trim();
+                });
+            }
+            
+            waitForIceGathering() {
+                return new Promise((resolve) => {
+                    if (this.peerConnection.iceGatheringState === 'complete') {
+                        resolve();
+                        return;
+                    }
+                    
+                    const checkState = () => {
+                        if (this.peerConnection.iceGatheringState === 'complete') {
+                            this.peerConnection.removeEventListener('icegatheringstatechange', checkState);
+                            resolve();
+                        }
+                    };
+                    
+                    this.peerConnection.addEventListener('icegatheringstatechange', checkState);
+                    
+                    // Timeout de sécurité
+                    setTimeout(() => {
+                        this.peerConnection.removeEventListener('icegatheringstatechange', checkState);
+                        resolve();
+                    }, 4000);
+                });
+            }
+            
+            async startAsInitiator() {
+                try {
+                    this.logDebug('🚀 Début création offre...', 'info');
+                    this.isInitiator = true;
+                    this.updateStatus('connecting', 'Création offre...');
+                    
+                    this.peerConnection = new RTCPeerConnection(this.configuration);
+                    this.setupConnectionListeners();
+                    
+                    // Créer le canal de données
+                    this.dataChannel = this.peerConnection.createDataChannel('chat', {
+                        ordered: true,
+                        maxPacketLifeTime: 3000
+                    });
+                    this.setupDataChannel(this.dataChannel);
+                    
+                    this.logDebug('📨 Canal de données créé', 'success');
+                    
+                    const offer = await this.peerConnection.createOffer();
+                    await this.peerConnection.setLocalDescription(offer);
+                    
+                    // Attendre la collecte des candidats ICE
+                    this.logDebug('⏳ Collecte des candidats ICE...', 'info');
+                    await this.waitForIceGathering();
+                    
+                    this.localSdp.value = JSON.stringify(this.peerConnection.localDescription);
+                    this.createOfferBtn.disabled = true;
+                    
+                    this.logDebug('✅ Offre créée avec succès !', 'success');
+                    this.addSystemMessage('✅ Offre créée ! Copiez le texte ci-dessus et envoyez-le à votre correspondant.');
+                    
+                } catch (error) {
+                    this.logDebug(`❌ Erreur création offre: ${error.message}`, 'error');
+                    this.addSystemMessage('❌ Erreur lors de la création de l\'offre');
+                }
+            }
+            
+            async handleRemoteDescription() {
+                try {
+                    if (this.remoteSdpProcessed) {
+                        this.logDebug('⚠️ Description déjà traitée', 'info');
+                        return;
+                    }
+                    
+                    const remoteSdp = JSON.parse(this.remoteSdp.value);
+                    this.logDebug(`📨 Réception description: ${remoteSdp.type}`, 'info');
+                    this.remoteSdpProcessed = true;
+                    
+                    if (!this.peerConnection) {
+                        // Nous sommes le répondant
+                        this.isInitiator = false;
+                        this.peerConnection = new RTCPeerConnection(this.configuration);
+                        this.setupConnectionListeners();
+                        
+                        // Configurer l'écoute des canaux de données entrants
+                        this.peerConnection.ondatachannel = (event) => {
+                            this.logDebug('🎯 Canal de données entrant détecté', 'success');
+                            this.dataChannel = event.channel;
+                            this.setupDataChannel(this.dataChannel);
+                        };
+                    }
+                    
+                    await this.peerConnection.setRemoteDescription(remoteSdp);
+                    this.logDebug('✅ Description distante appliquée', 'success');
+                    
+                    if (remoteSdp.type === 'offer') {
+                        // Créer une réponse
+                        const answer = await this.peerConnection.createAnswer();
+                        await this.peerConnection.setLocalDescription(answer);
+                        
+                        // Attendre la collecte des candidats ICE
+                        await this.waitForIceGathering();
+                        
+                        this.localSdp.value = JSON.stringify(this.peerConnection.localDescription);
+                        this.logDebug('✅ Réponse créée avec succès !', 'success');
+                        this.addSystemMessage('✅ Réponse créée ! Copiez ce texte et envoyez-le à votre correspondant.');
+                    } else {
+                        this.logDebug('✅ Traitement de la réponse...', 'success');
+                        this.addSystemMessage('✅ Réponse acceptée ! Connexion en cours...');
+                    }
+                    
+                    this.setAnswerBtn.disabled = true;
+                    
+                } catch (error) {
+                    this.logDebug(`❌ Erreur traitement SDP: ${error.message}`, 'error');
+                    this.addSystemMessage('❌ Erreur lors du traitement de la description');
+                    this.remoteSdpProcessed = false;
+                }
+            }
+            
+            setupConnectionListeners() {
+                this.peerConnection.onicecandidate = (event) => {
+                    if (event.candidate) {
+                        this.logDebug('❄️ Candidat ICE généré', 'info');
+                    }
+                };
+                
+                this.peerConnection.onconnectionstatechange = () => {
+                    const state = this.peerConnection.connectionState;
+                    this.logDebug(`🔗 État connexion: ${state}`, 'info');
+                    
+                    switch (state) {
+                        case 'connected':
+                            this.updateStatus('connected', 'Connecté P2P !');
+                            this.logDebug('🎉 CONNEXION RÉUSSIE !', 'success');
+                            break;
+                        case 'disconnected':
+                        case 'failed':
+                            this.updateStatus('disconnected', 'Déconnecté');
+                            this.enableChat(false);
+                            break;
+                        case 'connecting':
+                            this.updateStatus('connecting', 'Connexion en cours...');
+                            break;
+                    }
+                };
+            }
+            
+            setupDataChannel(channel) {
+                this.logDebug(`📊 Configuration canal: état ${channel.readyState}`, 'info');
+                
+                channel.onopen = () => {
+                    this.logDebug('✅ CANAL DE DONNÉES OUVERT !', 'success');
+                    this.addSystemMessage('🎉 Canal de communication établi ! Vous pouvez maintenant chatter.');
+                    this.enableChat(true);
+                    
+                    // Échanger les noms dès que le canal est ouvert
+                    setTimeout(() => {
+                        this.sendUserName();
+                    }, 500);
+                };
+                
+                channel.onclose = () => {
+                    this.logDebug('❌ Canal de données fermé', 'error');
+                    this.addSystemMessage('📵 Canal de communication fermé.');
+                    this.enableChat(false);
+                    this.nameExchanged = false;
+                    this.remoteUserName = "Correspondant";
+                    this.updateNameDisplay();
+                };
+                
+                channel.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        if (data.type === 'userName') {
+                            this.remoteUserName = data.name;
+                            this.remoteUserNameInput.value = this.remoteUserName;
+                            this.updateNameDisplay();
+                            this.logDebug(`📝 Nom reçu: ${this.remoteUserName}`, 'success');
+                            if (!this.nameExchanged) {
+                                this.addSystemMessage(`👋 Connecté avec ${this.remoteUserName}`);
+                                this.nameExchanged = true;
+                            }
+                        } else if (data.type === 'message') {
+                            this.logDebug(`📩 Message reçu de ${this.remoteUserName}: ${data.content}`, 'info');
+                            this.addMessage(this.remoteUserName, data.content, 'received');
+                        }
+                    } catch (error) {
+                        // Si le message n'est pas du JSON, c'est un message texte simple
+                        this.logDebug(`📩 Message reçu de ${this.remoteUserName}: ${event.data}`, 'info');
+                        this.addMessage(this.remoteUserName, event.data, 'received');
+                    }
+                };
+            }
+            
+            sendUserName() {
+                if (this.dataChannel && this.dataChannel.readyState === 'open') {
+                    const nameData = {
+                        type: 'userName',
+                        name: this.userName
+                    };
+                    this.dataChannel.send(JSON.stringify(nameData));
+                    this.logDebug(`📤 Nom envoyé: ${this.userName}`, 'info');
+                }
+            }
+            
+            sendMessage() {
+                const message = this.messageInput.value.trim();
+                
+                if (!message) return;
+                
+                if (this.dataChannel && this.dataChannel.readyState === 'open') {
+                    try {
+                        // Envoyer le message avec métadonnées
+                        const messageData = {
+                            type: 'message',
+                            content: message
+                        };
+                        this.dataChannel.send(JSON.stringify(messageData));
+                        
+                        this.addMessage(this.userName, message, 'sent');
+                        this.messageInput.value = '';
+                        this.logDebug(`📤 Message envoyé: "${message}"`, 'info');
+                    } catch (error) {
+                        this.logDebug(`❌ Erreur envoi message: ${error}`, 'error');
+                        this.addSystemMessage('❌ Erreur lors de l\'envoi du message');
+                    }
+                } else {
+                    this.logDebug('❌ Impossible d\'envoyer - canal fermé', 'error');
+                    this.addSystemMessage('❌ Canal non disponible pour l\'envoi');
+                }
+            }
+            
+            updateNameDisplay() {
+                if (this.remoteUserName && this.remoteUserName !== "Correspondant") {
+                    this.nameDisplay.textContent = `💬 Chat avec : ${this.remoteUserName}`;
+                    this.nameDisplay.style.background = '#28a745';
+                } else {
+                    this.nameDisplay.textContent = '⏳ En attente de connexion...';
+                    this.nameDisplay.style.background = '#4a00e0';
+                }
+            }
+            
+            enableChat(enabled) {
+                this.messageInput.disabled = !enabled;
+                this.sendBtn.disabled = !enabled;
+                this.disconnectBtn.disabled = !enabled;
+                
+                if (enabled) {
+                    this.messageInput.placeholder = "Tapez votre message...";
+                    this.messageInput.focus();
+                    this.logDebug('💬 CHAT ACTIVÉ - Prêt à envoyer des messages !', 'success');
+                } else {
+                    this.messageInput.placeholder = "Connectez-vous d'abord...";
+                }
+            }
+            
+            addMessage(sender, message, type) {
+                const messageElement = document.createElement('div');
+                messageElement.className = `message message-${type}`;
+                messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
+                
+                this.messagesContainer.appendChild(messageElement);
+                this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+            }
+            
+            addSystemMessage(message) {
+                const messageElement = document.createElement('div');
+                messageElement.className = 'message message-system';
+                messageElement.textContent = message;
+                
+                this.messagesContainer.appendChild(messageElement);
+                this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+            }
+            
+            updateStatus(status, text) {
+                this.statusText.textContent = text;
+                
+                this.statusDot.className = 'status-dot';
+                switch (status) {
+                    case 'connected':
+                        this.statusDot.classList.add('status-connected');
+                        break;
+                    case 'connecting':
+                        this.statusDot.classList.add('status-connecting');
+                        break;
+                    case 'disconnected':
+                        this.statusDot.classList.add('status-disconnected');
+                        break;
+                }
+            }
+            
+            logDebug(message, type = 'info') {
+                const timestamp = new Date().toLocaleTimeString();
+                const div = document.createElement('div');
+                div.className = `debug-item debug-${type}`;
+                div.textContent = `[${timestamp}] ${message}`;
+                this.debugPanel.appendChild(div);
+                this.debugPanel.scrollTop = this.debugPanel.scrollHeight;
+                
+                console.log(`[WebRTC-GitHub] ${message}`);
+            }
+            
+            disconnect() {
+                if (this.dataChannel) {
+                    this.dataChannel.close();
+                }
+                
+                if (this.peerConnection) {
+                    this.peerConnection.close();
+                }
+                
+                this.peerConnection = null;
+                this.dataChannel = null;
+                this.isInitiator = false;
+                this.remoteSdpProcessed = false;
+                this.nameExchanged = false;
+                this.remoteUserName = "Correspondant";
+                this.remoteUserNameInput.value = "";
+                this.updateNameDisplay();
+                
+                this.updateStatus('disconnected', 'Déconnecté');
+                this.enableChat(false);
+                this.createOfferBtn.disabled = false;
+                this.setAnswerBtn.disabled = true;
+                
+                this.logDebug('🔌 Déconnexion effectuée', 'info');
+                this.addSystemMessage('🔌 Connexion terminée.');
+            }
+        }
+        
+        // Démarrer l'application
+        document.addEventListener('DOMContentLoaded', () => {
+            window.chatApp = new WebRTCChat();
+        });
+    </script>
+</body>
+</html>
