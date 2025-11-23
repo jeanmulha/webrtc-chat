@@ -3,824 +3,2008 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat WebRTC - GitHub Pages</title>
+    <title>Lecteur Radio Pro - JunTech Electronics DG</title>
+
     <style>
+        :root {
+            --bg: #111b21;
+            --card-bg: #202c33;
+            --accent: #00a884;
+            --accent-dark: #00876b;
+            --text: #e9edef;
+            --subtext: #8696a0;
+            --danger: #f15b5b;
+            --warning: #f1c45b;
+            --success: #5bf15b;
+        }
+
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
-        
+
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: radial-gradient(circle at top, #202c33 0, #111b21 45%, #000 100%);
+            color: var(--text);
             min-height: 100vh;
-            padding: 20px;
             display: flex;
+            align-items: center;
             justify-content: center;
+            padding: 16px;
+        }
+
+        .player-container {
+            width: 100%;
+            max-width: 480px;
+            background: rgba(16, 27, 33, 0.96);
+            border-radius: 24px;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
+            padding: 18px 18px 22px;
+            border: 1px solid rgba(134, 150, 160, 0.25);
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .logo {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: #0b141a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px solid rgba(134, 150, 160, 0.4);
+        }
+
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .titles {
+            flex: 1;
+        }
+
+        .titles h1 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .titles p {
+            font-size: 12px;
+            color: var(--subtext);
+            margin-top: 2px;
+        }
+
+        .status-pill {
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(134, 150, 160, 0.4);
+            color: var(--subtext);
+        }
+
+        .status-pill.live {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .status-pill.error {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .status-pill.warning {
+            border-color: var(--warning);
+            color: var(--warning);
+        }
+
+        .status-pill.success {
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 12px;
+            background: #111b21;
+            border: 1px solid rgba(134, 150, 160, 0.35);
+            color: var(--subtext);
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .action-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .action-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .station-info {
+            margin-bottom: 12px;
+            padding: 10px;
+            border-radius: 14px;
+            background: #111b21;
+            border: 1px solid rgba(134, 150, 160, 0.35);
+        }
+
+        .station-label {
+            font-size: 11px;
+            color: var(--subtext);
+            margin-bottom: 4px;
+        }
+
+        .station-name {
+            font-size: 13px;
+            color: var(--text);
+            font-weight: 600;
+            min-height: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .station-description {
+            font-size: 11px;
+            color: var(--subtext);
+            margin-top: 2px;
+        }
+
+        .track-info {
+            margin-bottom: 12px;
+            padding: 10px;
+            border-radius: 14px;
+            background: #111b21;
+            border: 1px solid rgba(134, 150, 160, 0.35);
+        }
+
+        .track-label {
+            font-size: 11px;
+            color: var(--subtext);
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
         }
-        
-        .container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-            width: 100%;
-            max-width: 900px;
+
+        .track-title {
+            font-size: 12px;
+            color: var(--text);
+            font-weight: 500;
+            min-height: 16px;
         }
-        
-        header {
-            background: linear-gradient(135deg, #4a00e0 0%, #8e2de2 100%);
-            color: white;
-            padding: 20px;
+
+        .track-artist {
+            font-size: 11px;
+            color: var(--subtext);
+            margin-top: 2px;
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            font-size: 10px;
+            color: var(--subtext);
+        }
+
+        .stat-item {
+            flex: 1;
             text-align: center;
+            padding: 4px;
+            background: rgba(11, 20, 26, 0.5);
+            border-radius: 6px;
         }
-        
-        h1 {
-            font-size: 1.8rem;
-            margin-bottom: 5px;
+
+        .visualizer {
+            margin-bottom: 12px;
+            padding: 8px 10px;
+            border-radius: 16px;
+            background: #0b141a;
+            border: 1px solid rgba(134, 150, 160, 0.3);
         }
-        
-        .subtitle {
-            opacity: 0.9;
-            font-size: 0.9rem;
-        }
-        
-        .github-info {
-            background: #f1f8ff;
-            color: #0366d6;
-            padding: 8px;
-            border-radius: 5px;
-            margin-top: 10px;
-            font-size: 0.8rem;
-        }
-        
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0;
-            min-height: 500px;
-        }
-        
-        @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .connection-panel {
-            background: #f8f9fa;
-            padding: 20px;
-            border-right: 1px solid #e9ecef;
+
+        .visualizer-label {
+            font-size: 11px;
+            color: var(--subtext);
+            margin-bottom: 4px;
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
         }
-        
-        .chat-panel {
-            padding: 20px;
+
+        .viz-controls {
             display: flex;
-            flex-direction: column;
+            gap: 6px;
         }
-        
-        .section-title {
-            color: #495057;
-            margin-bottom: 15px;
-            font-size: 1.1rem;
-            border-bottom: 2px solid #4a00e0;
-            padding-bottom: 8px;
+
+        .viz-btn {
+            background: transparent;
+            border: 1px solid rgba(134, 150, 160, 0.4);
+            color: var(--subtext);
+            border-radius: 999px;
+            padding: 2px 8px;
+            font-size: 9px;
+            cursor: pointer;
+            transition: all 0.15s;
         }
-        
-        .config-group {
-            margin-bottom: 15px;
+
+        .viz-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
         }
-        
-        label {
+
+        .viz-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        canvas {
+            width: 100%;
+            height: 48px;
             display: block;
-            margin-bottom: 5px;
-            color: #495057;
+            background: #0b141a;
+            border-radius: 8px;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .play-btn {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: none;
+            background: var(--accent);
+            color: #fff;
+            font-size: 26px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 18px rgba(0, 168, 132, 0.55);
+            transition: background 0.15s, transform 0.08s, box-shadow 0.15s;
+        }
+
+        .play-btn:hover {
+            background: var(--accent-dark);
+            transform: translateY(-1px);
+        }
+
+        .play-btn:active {
+            transform: translateY(1px) scale(0.97);
+            box-shadow: 0 4px 10px rgba(0, 168, 132, 0.4);
+        }
+
+        .secondary-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .secondary-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 12px;
+            background: #111b21;
+            border: 1px solid rgba(134, 150, 160, 0.35);
+            color: var(--subtext);
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .secondary-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .volume-block {
+            flex: 1;
+        }
+
+        .volume-label {
+            font-size: 11px;
+            color: var(--subtext);
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .volume-block input[type="range"] {
+            width: 100%;
+        }
+
+        .equalizer-block {
+            margin-bottom: 12px;
+            padding: 10px;
+            border-radius: 14px;
+            background: #111b21;
+            border: 1px solid rgba(134, 150, 160, 0.35);
+            transition: all 0.3s ease;
+        }
+
+        .equalizer-block.collapsed {
+            height: 40px;
+            overflow: hidden;
+        }
+
+        .equalizer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .equalizer-label {
+            font-size: 11px;
+            color: var(--subtext);
+        }
+
+        .equalizer-toggle {
+            background: transparent;
+            border: 1px solid rgba(134, 150, 160, 0.4);
+            color: var(--subtext);
+            border-radius: 999px;
+            padding: 2px 8px;
+            font-size: 9px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .equalizer-toggle:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .equalizer-controls {
+            display: flex;
+            gap: 4px;
+            justify-content: space-between;
+        }
+
+        .eq-slider {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 0;
+        }
+
+        .eq-slider label {
+            font-size: 7px;
+            color: var(--subtext);
+            margin-bottom: 4px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+
+        .eq-slider input[type="range"] {
+            writing-mode: bt-lr;
+            -webkit-appearance: slider-vertical;
+            width: 5px;
+            height: 50px;
+        }
+
+        .eq-value {
+            font-size: 7px;
+            color: var(--subtext);
+            margin-top: 4px;
+            min-height: 10px;
+        }
+
+        .presets-block {
+            margin-bottom: 12px;
+            padding: 10px;
+            border-radius: 14px;
+            background: #111b21;
+            border: 1px solid rgba(134, 150, 160, 0.35);
+        }
+
+        .presets-label {
+            font-size: 11px;
+            color: var(--subtext);
+            margin-bottom: 8px;
+        }
+
+        .presets-buttons {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .preset-btn {
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(134, 150, 160, 0.4);
+            background: transparent;
+            color: var(--subtext);
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .preset-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .preset-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .recording-block {
+            margin-bottom: 12px;
+            padding: 10px;
+            border-radius: 14px;
+            background: #111b21;
+            border: 1px solid rgba(134, 150, 160, 0.35);
+            transition: all 0.3s ease;
+        }
+
+        .recording-block.collapsed {
+            height: 40px;
+            overflow: hidden;
+        }
+
+        .recording-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .recording-label {
+            font-size: 11px;
+            color: var(--subtext);
+        }
+
+        .recording-toggle {
+            background: transparent;
+            border: 1px solid rgba(134, 150, 160, 0.4);
+            color: var(--subtext);
+            border-radius: 999px;
+            padding: 2px 8px;
+            font-size: 9px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .recording-toggle:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .recordings-btn {
+            background: transparent;
+            border: 1px solid rgba(134, 150, 160, 0.4);
+            color: var(--subtext);
+            border-radius: 999px;
+            padding: 2px 8px;
+            font-size: 9px;
+            cursor: pointer;
+            transition: all 0.15s;
+            margin-left: 6px;
+        }
+
+        .recordings-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .recording-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .record-btn {
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid var(--danger);
+            background: transparent;
+            color: var(--danger);
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .record-btn:hover {
+            background: rgba(241, 91, 91, 0.1);
+        }
+
+        .record-btn.recording {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .timer {
+            font-size: 11px;
+            color: var(--subtext);
+        }
+
+        .sleep-timer-block {
+            margin-bottom: 12px;
+            padding: 10px;
+            border-radius: 14px;
+            background: #111b21;
+            border: 1px solid rgba(134, 150, 160, 0.35);
+            transition: all 0.3s ease;
+        }
+
+        .sleep-timer-block.collapsed {
+            height: 40px;
+            overflow: hidden;
+        }
+
+        .sleep-timer-label {
+            font-size: 11px;
+            color: var(--subtext);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sleep-timer-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .sleep-timer-btn {
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid var(--warning);
+            background: transparent;
+            color: var(--warning);
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .sleep-timer-btn:hover {
+            background: rgba(241, 196, 91, 0.1);
+        }
+
+        .sleep-timer-btn.active {
+            background: var(--warning);
+            color: #111b21;
+        }
+
+        .sleep-timer-display {
+            font-size: 11px;
+            color: var(--subtext);
+        }
+
+        .sleep-timer-toggle {
+            background: transparent;
+            border: 1px solid rgba(134, 150, 160, 0.4);
+            color: var(--subtext);
+            border-radius: 999px;
+            padding: 2px 8px;
+            font-size: 9px;
+            cursor: pointer;
+            transition: all 0.15s;
+            margin-left: 6px;
+        }
+
+        .sleep-timer-toggle:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .recordings-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .recordings-content {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 16px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .recordings-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .recordings-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .close-recordings {
+            background: transparent;
+            border: none;
+            color: var(--subtext);
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .recordings-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .recording-item {
+            padding: 8px 12px;
+            background: #111b21;
+            border-radius: 8px;
+            border: 1px solid rgba(134, 150, 160, 0.3);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .recording-info {
+            flex: 1;
+        }
+
+        .recording-name {
+            font-size: 11px;
+            color: var(--text);
+            word-break: break-all;
+        }
+
+        .recording-date {
+            font-size: 9px;
+            color: var(--subtext);
+            margin-top: 2px;
+        }
+
+        .recording-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-icon {
+            background: transparent;
+            border: none;
+            color: var(--accent);
+            font-size: 14px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background 0.15s;
+        }
+
+        .action-icon:hover {
+            background: rgba(0, 168, 132, 0.1);
+        }
+
+        .download-info {
+            font-size: 9px;
+            color: var(--subtext);
+            margin-top: 8px;
+            text-align: center;
+            padding: 4px;
+            background: rgba(11, 20, 26, 0.5);
+            border-radius: 6px;
+        }
+
+        .footer-status {
+            margin-top: 8px;
+            font-size: 11px;
+            color: var(--subtext);
+            display: flex;
+            justify-content: space-between;
+            gap: 6px;
+        }
+
+        .footer-status span {
+            min-width: 0;
+        }
+
+        .status-main {
             font-weight: 500;
         }
-        
-        input[type="text"] {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
-            font-size: 0.9rem;
+
+        .bitrate-display {
+            font-size: 10px;
+            color: var(--subtext);
         }
-        
-        textarea {
-            width: 100%;
-            height: 100px;
-            padding: 10px;
-            border: 1px solid #ced4da;
-            border-radius: 8px;
-            resize: vertical;
-            font-family: monospace;
-            font-size: 0.8rem;
-        }
-        
-        .button-group {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 10px;
-        }
-        
-        button {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            flex: 1;
-            min-width: 110px;
-            font-size: 0.9rem;
-        }
-        
-        .btn-primary {
-            background: #4a00e0;
-            color: white;
-        }
-        
-        .btn-primary:hover:not(:disabled) {
-            background: #3a00b0;
-        }
-        
-        .btn-success {
-            background: #28a745;
-            color: white;
-        }
-        
-        .btn-success:hover:not(:disabled) {
-            background: #218838;
-        }
-        
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
-        
-        .btn-danger:hover:not(:disabled) {
-            background: #c82333;
-        }
-        
-        button:disabled {
-            background: #adb5bd;
-            cursor: not-allowed;
-        }
-        
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            margin: 15px 0;
-            padding: 12px;
-            border-radius: 6px;
-            background: #f8f9fa;
-            font-size: 0.9rem;
-        }
-        
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-        
-        .status-disconnected {
-            background: #dc3545;
-        }
-        
-        .status-connecting {
-            background: #ffc107;
-        }
-        
-        .status-connected {
-            background: #28a745;
-        }
-        
-        .messages-container {
-            flex: 1;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 12px;
-            overflow-y: auto;
-            background: #fdfdfd;
-            margin-bottom: 12px;
-            min-height: 300px;
-        }
-        
-        .message {
-            margin-bottom: 10px;
-            padding: 8px 12px;
-            border-radius: 15px;
-            max-width: 85%;
-            word-wrap: break-word;
-            font-size: 0.9rem;
-        }
-        
-        .message-sent {
-            background: #4a00e0;
-            color: white;
-            margin-left: auto;
-            border-bottom-right-radius: 5px;
-        }
-        
-        .message-received {
-            background: #e9ecef;
-            color: #495057;
-            border-bottom-left-radius: 5px;
-        }
-        
-        .message-system {
-            background: #fff3cd;
-            color: #856404;
-            margin: 0 auto;
-            text-align: center;
-            font-style: italic;
-            max-width: 90%;
-            font-size: 0.85rem;
-        }
-        
-        .input-group {
-            display: flex;
-            gap: 8px;
-        }
-        
-        #messageInput {
-            flex: 1;
-            padding: 10px 12px;
-            border: 1px solid #ced4da;
-            border-radius: 20px;
-            outline: none;
-            font-size: 0.9rem;
-        }
-        
-        #messageInput:focus {
-            border-color: #4a00e0;
-        }
-        
-        .debug-panel {
-            background: #2d3748;
-            color: white;
-            padding: 10px;
-            border-radius: 6px;
-            margin-top: 12px;
-            font-family: monospace;
-            font-size: 0.75rem;
-            max-height: 120px;
-            overflow-y: auto;
-            flex-shrink: 0;
-        }
-        
-        .debug-item {
-            margin-bottom: 3px;
-        }
-        
-        .debug-success {
-            color: #68d391;
-        }
-        
-        .debug-error {
-            color: #fc8181;
-        }
-        
-        .debug-info {
-            color: #63b3ed;
-        }
-        
-        .instructions {
-            background: #e7f3ff;
-            border: 1px solid #b3d4fc;
-            border-radius: 6px;
-            padding: 12px;
-            margin-top: 15px;
-            font-size: 0.8rem;
-        }
-        
-        .instructions-title {
-            font-weight: 600;
-            color: #004085;
-            margin-bottom: 5px;
-        }
-        
-        .instructions-text {
-            color: #004085;
-            line-height: 1.4;
-        }
-        
-        .name-display {
-            background: #4a00e0;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        
-        .copy-hint {
-            background: #d4edda;
-            color: #155724;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            margin-top: 5px;
-            text-align: center;
+
+        @media (max-width: 380px) {
+            .player-container {
+                padding: 14px 12px 16px;
+                border-radius: 18px;
+            }
+            .header {
+                gap: 10px;
+            }
+            .logo {
+                width: 50px;
+                height: 50px;
+            }
+            .equalizer-controls {
+                gap: 3px;
+            }
+            .eq-slider input[type="range"] {
+                height: 45px;
+            }
+            .quick-actions {
+                flex-wrap: wrap;
+            }
+            .action-btn {
+                flex: 1 1 calc(50% - 4px);
+                min-width: 0;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Chat WebRTC - GitHub Pages</h1>
-            <div class="subtitle">Hébergé gratuitement sur GitHub</div>
-            <div class="github-info">
-                ✅ Compatible GitHub Pages - Aucun serveur nécessaire
+
+<div class="player-container">
+    <div class="header">
+        <div class="logo">
+            <img src="https://jtebroadcast.net/juntech_logo.png" alt="JunTech Electronics DG">
+        </div>
+        <div class="titles">
+            <h1>Radio JunTech Pro</h1>
+            <p>Lecteur radio avancé avec fonctionnalités premium</p>
+        </div>
+        <div class="status-pill" id="status-pill">En attente</div>
+    </div>
+
+    <div class="quick-actions">
+        <button class="action-btn" id="favoriteBtn" title="Ajouter aux favoris">
+            <span>★</span> Favori
+        </button>
+        <button class="action-btn" id="shareBtn" title="Partager ce flux">
+            <span>↗</span> Partager
+        </button>
+        <button class="action-btn" id="statsBtn" title="Statistiques détaillées">
+            <span>📊</span> Stats
+        </button>
+    </div>
+
+    <div class="station-info">
+        <div class="station-label">Station Radio</div>
+        <div class="station-name" id="stationName">
+            <span>📻</span>
+            <span id="stationNameText">Radio JunTech</span>
+        </div>
+        <div class="station-description" id="stationDescription">
+            Votre webradio JunTech - Musique en continu
+        </div>
+    </div>
+
+    <div class="track-info">
+        <div class="track-label">
+            <span>En cours de lecture</span>
+            <span id="listenersCount">👥 0</span>
+        </div>
+        <div class="track-title" id="trackTitle">Chargement...</div>
+        <div class="track-artist" id="trackArtist"></div>
+        <div class="stats-row">
+            <div class="stat-item" id="bitrateStat">Bitrate: -</div>
+            <div class="stat-item" id="bufferStat">Buffer: -</div>
+            <div class="stat-item" id="qualityStat">Qualité: -</div>
+        </div>
+    </div>
+
+    <div class="visualizer">
+        <div class="visualizer-label">
+            <span>Visualiseur audio haute performance</span>
+            <div class="viz-controls">
+                <button class="viz-btn active" data-viz="bars">Barres</button>
+                <button class="viz-btn" data-viz="wave">Onde</button>
+                <button class="viz-btn" data-viz="circle">Cercle</button>
+                <button class="viz-btn" data-viz="spectrum">Spectre</button>
             </div>
-        </header>
-        
-        <div class="main-content">
-            <div class="connection-panel">
-                <h3 class="section-title">Configuration de la Connexion</h3>
-                
-                <div class="config-group">
-                    <label>Votre nom :</label>
-                    <input type="text" id="userName" placeholder="Votre nom..." value="Utilisateur">
-                </div>
-                
-                <div class="config-group">
-                    <label>Nom de votre correspondant :</label>
-                    <input type="text" id="remoteUserName" placeholder="Nom reçu automatiquement..." readonly>
-                </div>
-                
-                <div class="config-group">
-                    <label>Votre Description Locale :</label>
-                    <textarea id="localSdp" readonly placeholder="Votre offre ou réponse apparaîtra ici..."></textarea>
-                    <div class="copy-hint">📋 Copiez ce texte et envoyez-le à votre correspondant</div>
-                </div>
-                
-                <div class="config-group">
-                    <label>Description Distante (à coller) :</label>
-                    <textarea id="remoteSdp" placeholder="Collez ici la description reçue de l'autre navigateur..."></textarea>
-                    <div class="copy-hint">📥 Collez le texte reçu de votre correspondant</div>
-                </div>
-                
-                <div class="button-group">
-                    <button id="createOffer" class="btn-primary">Créer une Offre</button>
-                    <button id="setAnswer" class="btn-success" disabled>Accepter la Réponse</button>
-                </div>
-                
-                <div class="status-indicator">
-                    <div class="status-dot status-disconnected"></div>
-                    <span id="statusText">Déconnecté</span>
-                </div>
-                
-                <div class="debug-panel" id="debugPanel">
-                    <div class="debug-item debug-info">Prêt à se connecter...</div>
-                </div>
-                
-                <div class="button-group">
-                    <button id="disconnectBtn" class="btn-danger" disabled>Déconnecter</button>
-                </div>
-                
-                <div class="instructions">
-                    <div class="instructions-title">📖 Instructions :</div>
-                    <div class="instructions-text">
-                        1. <strong>Utilisateur A</strong> : Créer une offre → Copier le texte<br>
-                        2. <strong>Utilisateur B</strong> : Coller l'offre → Créer une réponse → Copier<br>
-                        3. <strong>Utilisateur A</strong> : Coller la réponse<br>
-                        4. <strong>Les noms s'échangent automatiquement</strong><br>
-                        5. <strong>Chattez en temps réel !</strong>
-                    </div>
-                </div>
+        </div>
+        <canvas id="vizCanvas"></canvas>
+    </div>
+
+    <div class="controls">
+        <button class="play-btn" id="playBtn">▶</button>
+
+        <div class="volume-block">
+            <div class="volume-label">
+                <span>Volume</span>
+                <span id="volumeValue">100%</span>
             </div>
-            
-            <div class="chat-panel">
-                <h3 class="section-title">💬 Chat en Temps Réel</h3>
-                
-                <div class="name-display" id="nameDisplay">
-                    En attente de connexion...
-                </div>
-                
-                <div class="messages-container" id="messagesContainer">
-                    <div class="message message-system">
-                        Bienvenue ! Établissez une connexion WebRTC pour commencer à chatter
-                    </div>
-                </div>
-                
-                <div class="input-group">
-                    <input type="text" id="messageInput" placeholder="Connectez-vous d'abord..." disabled>
-                    <button id="sendBtn" class="btn-primary" disabled>Envoyer</button>
-                </div>
+            <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="1">
+        </div>
+    </div>
+
+    <div class="secondary-controls">
+        <button class="secondary-btn" id="muteBtn" title="Couper le son">
+            <span>🔇</span> Mute
+        </button>
+        <button class="secondary-btn" id="replayBtn" title="Redémarrer le flux">
+            <span>↻</span> Replay
+        </button>
+        <button class="secondary-btn" id="boostBtn" title="Boost des basses">
+            <span>🔊</span> Bass Boost
+        </button>
+    </div>
+
+    <div class="equalizer-block" id="equalizerBlock">
+        <div class="equalizer-header">
+            <div class="equalizer-label">Égaliseur 9 Bandes</div>
+            <button class="equalizer-toggle" id="eqToggle">Masquer</button>
+        </div>
+        <div class="equalizer-controls">
+            <div class="eq-slider">
+                <label for="eqSub">32Hz</label>
+                <input id="eqSub" type="range" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                <div class="eq-value" id="eqSubValue">0dB</div>
+            </div>
+            <div class="eq-slider">
+                <label for="eqLow1">64Hz</label>
+                <input id="eqLow1" type="range" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                <div class="eq-value" id="eqLow1Value">0dB</div>
+            </div>
+            <div class="eq-slider">
+                <label for="eqLow2">125Hz</label>
+                <input id="eqLow2" type="range" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                <div class="eq-value" id="eqLow2Value">0dB</div>
+            </div>
+            <div class="eq-slider">
+                <label for="eqLowMid">250Hz</label>
+                <input id="eqLowMid" type="range" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                <div class="eq-value" id="eqLowMidValue">0dB</div>
+            </div>
+            <div class="eq-slider">
+                <label for="eqMid">500Hz</label>
+                <input id="eqMid" type="range" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                <div class="eq-value" id="eqMidValue">0dB</div>
+            </div>
+            <div class="eq-slider">
+                <label for="eqHighMid1">1kHz</label>
+                <input id="eqHighMid1" type="range" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                <div class="eq-value" id="eqHighMid1Value">0dB</div>
+            </div>
+            <div class="eq-slider">
+                <label for="eqHighMid2">2kHz</label>
+                <input id="eqHighMid2" type="range" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                <div class="eq-value" id="eqHighMid2Value">0dB</div>
+            </div>
+            <div class="eq-slider">
+                <label for="eqHigh1">4kHz</label>
+                <input id="eqHigh1" type="range" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                <div class="eq-value" id="eqHigh1Value">0dB</div>
+            </div>
+            <div class="eq-slider">
+                <label for="eqHigh2">8kHz</label>
+                <input id="eqHigh2" type="range" min="-12" max="12" value="0" step="0.5" orient="vertical">
+                <div class="eq-value" id="eqHigh2Value">0dB</div>
             </div>
         </div>
     </div>
 
-    <script>
-        class WebRTCChat {
-            constructor() {
-                this.peerConnection = null;
-                this.dataChannel = null;
-                this.isInitiator = false;
-                this.remoteSdpProcessed = false;
-                this.userName = "Utilisateur";
-                this.remoteUserName = "Correspondant";
-                this.nameExchanged = false;
-                
-                // Configuration optimisée pour GitHub Pages
-                this.configuration = {
-                    iceServers: [
-                        { urls: 'stun:stun.l.google.com:19302' },
-                        { urls: 'stun:stun1.l.google.com:19302' },
-                        { urls: 'stun:stun2.l.google.com:19302' },
-                        { 
-                            urls: 'turn:relay.metered.ca:80',
-                            username: 'openai',
-                            credential: 'openai123'
-                        }
-                    ],
-                    iceCandidatePoolSize: 10
-                };
-                
-                this.initialize();
+    <div class="presets-block">
+        <div class="presets-label">Présélections d'égaliseur</div>
+        <div class="presets-buttons">
+            <button class="preset-btn" data-preset="flat">Plat</button>
+            <button class="preset-btn" data-preset="bass">Basses</button>
+            <button class="preset-btn" data-preset="treble">Aigus</button>
+            <button class="preset-btn" data-preset="vocal">Voix</button>
+            <button class="preset-btn" data-preset="rock">Rock</button>
+            <button class="preset-btn" data-preset="jazz">Jazz</button>
+            <button class="preset-btn" data-preset="classical">Classique</button>
+            <button class="preset-btn" data-preset="electronic">Électronique</button>
+        </div>
+    </div>
+
+    <div class="sleep-timer-block" id="sleepTimerBlock">
+        <div class="sleep-timer-label">
+            <span>Minuterie de veille</span>
+            <div>
+                <button class="sleep-timer-toggle" id="sleepTimerToggle">Masquer</button>
+            </div>
+        </div>
+        <div class="sleep-timer-controls">
+            <button class="sleep-timer-btn" data-minutes="15">15 min</button>
+            <button class="sleep-timer-btn" data-minutes="30">30 min</button>
+            <button class="sleep-timer-btn" data-minutes="60">60 min</button>
+            <button class="sleep-timer-btn" id="stopSleepTimer">Arrêter</button>
+        </div>
+        <div class="sleep-timer-display" id="sleepTimerDisplay">Désactivée</div>
+    </div>
+
+    <div class="recording-block" id="recordingBlock">
+        <div class="recording-header">
+            <div class="recording-label">Enregistrement audio</div>
+            <div>
+                <button class="recordings-btn" id="recordingsBtn">Mes enregistrements</button>
+                <button class="recording-toggle" id="recordingToggle">Masquer</button>
+            </div>
+        </div>
+        <div class="recording-controls">
+            <button class="record-btn" id="recordBtn">● Enregistrer</button>
+            <div class="timer" id="recordTimer">00:00</div>
+        </div>
+        <div class="download-info">
+            📁 Les enregistrements sont sauvegardés dans votre dossier "Téléchargements"
+        </div>
+    </div>
+
+    <div class="footer-status">
+        <span class="status-main" id="statusText">Prêt à écouter Radio JunTech</span>
+        <span id="metaText">https://webradiojte.ngrok.app/stream</span>
+        <span class="bitrate-display" id="bitrateDisplay">- kbps</span>
+    </div>
+
+    <audio id="radio" preload="none" crossorigin="anonymous"></audio>
+</div>
+
+<!-- Modal Enregistrements -->
+<div class="recordings-modal" id="recordingsModal">
+    <div class="recordings-content">
+        <div class="recordings-header">
+            <div class="recordings-title">Mes enregistrements</div>
+            <button class="close-recordings" id="closeRecordings">&times;</button>
+        </div>
+        <div class="recordings-list" id="recordingsList">
+            <!-- Les enregistrements seront ajoutés ici -->
+        </div>
+    </div>
+</div>
+
+<script>
+    const DEFAULT_RADIO_URL = "https://webradiojte.ngrok.app/stream";
+
+    // Éléments DOM
+    const audio = document.getElementById('radio');
+    const playBtn = document.getElementById('playBtn');
+    const volumeSlider = document.getElementById('volumeSlider');
+    const volumeValue = document.getElementById('volumeValue');
+    const statusText = document.getElementById('statusText');
+    const statusPill = document.getElementById('status-pill');
+    const bitrateDisplay = document.getElementById('bitrateDisplay');
+    const vizButtons = document.querySelectorAll('.viz-btn');
+    const recordBtn = document.getElementById('recordBtn');
+    const recordTimer = document.getElementById('recordTimer');
+    const eqToggle = document.getElementById('eqToggle');
+    const equalizerBlock = document.getElementById('equalizerBlock');
+    const trackTitle = document.getElementById('trackTitle');
+    const trackArtist = document.getElementById('trackArtist');
+    const recordingsBtn = document.getElementById('recordingsBtn');
+    const recordingsModal = document.getElementById('recordingsModal');
+    const closeRecordings = document.getElementById('closeRecordings');
+    const recordingsList = document.getElementById('recordingsList');
+    const recordingToggle = document.getElementById('recordingToggle');
+    const recordingBlock = document.getElementById('recordingBlock');
+    const favoriteBtn = document.getElementById('favoriteBtn');
+    const shareBtn = document.getElementById('shareBtn');
+    const statsBtn = document.getElementById('statsBtn');
+    const muteBtn = document.getElementById('muteBtn');
+    const replayBtn = document.getElementById('replayBtn');
+    const boostBtn = document.getElementById('boostBtn');
+    const sleepTimerBtns = document.querySelectorAll('.sleep-timer-btn');
+    const stopSleepTimer = document.getElementById('stopSleepTimer');
+    const sleepTimerDisplay = document.getElementById('sleepTimerDisplay');
+    const sleepTimerToggle = document.getElementById('sleepTimerToggle');
+    const sleepTimerBlock = document.getElementById('sleepTimerBlock');
+    const listenersCount = document.getElementById('listenersCount');
+    const bitrateStat = document.getElementById('bitrateStat');
+    const bufferStat = document.getElementById('bufferStat');
+    const qualityStat = document.getElementById('qualityStat');
+    const stationNameText = document.getElementById('stationNameText');
+    const stationDescription = document.getElementById('stationDescription');
+
+    // Égaliseur 9 bandes
+    const eqSub = document.getElementById('eqSub');
+    const eqLow1 = document.getElementById('eqLow1');
+    const eqLow2 = document.getElementById('eqLow2');
+    const eqLowMid = document.getElementById('eqLowMid');
+    const eqMid = document.getElementById('eqMid');
+    const eqHighMid1 = document.getElementById('eqHighMid1');
+    const eqHighMid2 = document.getElementById('eqHighMid2');
+    const eqHigh1 = document.getElementById('eqHigh1');
+    const eqHigh2 = document.getElementById('eqHigh2');
+    
+    // Affichage des valeurs
+    const eqSubValue = document.getElementById('eqSubValue');
+    const eqLow1Value = document.getElementById('eqLow1Value');
+    const eqLow2Value = document.getElementById('eqLow2Value');
+    const eqLowMidValue = document.getElementById('eqLowMidValue');
+    const eqMidValue = document.getElementById('eqMidValue');
+    const eqHighMid1Value = document.getElementById('eqHighMid1Value');
+    const eqHighMid2Value = document.getElementById('eqHighMid2Value');
+    const eqHigh1Value = document.getElementById('eqHigh1Value');
+    const eqHigh2Value = document.getElementById('eqHigh2Value');
+
+    const presetButtons = document.querySelectorAll('.preset-btn');
+
+    // Variables globales
+    let audioCtx, analyser, sourceNode, eqNodes = [];
+    let mediaRecorder, recordedChunks = [], recordingStartTime;
+    let vizType = 'bars';
+    let animationId;
+    let smoothing = 0.8;
+    let currentMetadata = { title: '', artist: '' };
+    let metadataInterval;
+    let sleepTimer = null;
+    let isMuted = false;
+    let originalVolume = 1;
+    let isBassBoost = false;
+    let recordTimerInterval;
+
+    // Variables pour le canvas
+    const canvas = document.getElementById('vizCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Variables d'animation pour l'onde
+    let wavePhase = 0;
+
+    // Stockage compatible Android
+    let androidStorage = {
+        getItem: function(key) {
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    const item = localStorage.getItem(key);
+                    return item ? JSON.parse(item) : null;
+                }
+            } catch (e) {
+                console.log('localStorage non disponible');
+            }
+            return this[key] || null;
+        },
+        setItem: function(key, value) {
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    localStorage.setItem(key, JSON.stringify(value));
+                    return;
+                }
+            } catch (e) {
+                console.log('localStorage non disponible');
+            }
+            this[key] = value;
+        }
+    };
+
+    let recordingsHistory = androidStorage.getItem('radio_recordings') || [];
+
+    // --- INITIALISATION RADIO JUNTECH ---
+    function initializeRadio() {
+        // Configurer la source audio avec l'URL par défaut
+        audio.src = DEFAULT_RADIO_URL;
+        
+        // Mettre à jour le statut
+        setStatus("Radio JunTech prête à écouter", "success");
+        
+        // Démarrer la récupération des métadonnées
+        startMetadataPolling();
+        
+        // Configurer les informations de la station
+        updateStationInfo({
+            name: "Radio JunTech",
+            description: "Votre webradio JunTech - Musique en continu",
+            genre: "Divers",
+            bitrate: 128
+        });
+    }
+
+    // --- FONCTIONS D'ENREGISTREMENT ---
+    function startRecording() {
+        if (!audio.src) {
+            setStatus("Aucune source audio à enregistrer", "error");
+            return;
+        }
+        
+        try {
+            recordedChunks = [];
+            const stream = audio.captureStream ? audio.captureStream() : null;
+            
+            if (!stream) {
+                setStatus("Enregistrement non supporté", "error");
+                return;
             }
             
-            initialize() {
-                this.userNameInput = document.getElementById('userName');
-                this.remoteUserNameInput = document.getElementById('remoteUserName');
-                this.localSdp = document.getElementById('localSdp');
-                this.remoteSdp = document.getElementById('remoteSdp');
-                this.createOfferBtn = document.getElementById('createOffer');
-                this.setAnswerBtn = document.getElementById('setAnswer');
-                this.disconnectBtn = document.getElementById('disconnectBtn');
-                this.messageInput = document.getElementById('messageInput');
-                this.sendBtn = document.getElementById('sendBtn');
-                this.messagesContainer = document.getElementById('messagesContainer');
-                this.statusText = document.getElementById('statusText');
-                this.statusDot = document.querySelector('.status-dot');
-                this.debugPanel = document.getElementById('debugPanel');
-                this.nameDisplay = document.getElementById('nameDisplay');
-                
-                this.setupEventListeners();
-                this.updateNameDisplay();
-                this.logDebug('✅ Application initialisée - Prête pour GitHub Pages', 'info');
+            const options = {
+                mimeType: 'audio/webm;codecs=opus',
+                audioBitsPerSecond: 128000
+            };
+            
+            mediaRecorder = new MediaRecorder(stream, options);
+            
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) {
+                    recordedChunks.push(e.data);
+                }
+            };
+            
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+                saveRecording(blob);
+            };
+            
+            mediaRecorder.start(1000);
+            recordingStartTime = Date.now();
+            recordBtn.classList.add('recording');
+            recordBtn.textContent = '■ Arrêter';
+            
+            updateRecordTimer();
+            recordTimerInterval = setInterval(updateRecordTimer, 1000);
+            
+            setStatus("Enregistrement en cours", "live");
+        } catch (e) {
+            console.error("Erreur enregistrement:", e);
+            setStatus("Erreur d'enregistrement", "error");
+        }
+    }
+
+    function stopRecording() {
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+            recordBtn.classList.remove('recording');
+            recordBtn.textContent = '● Enregistrer';
+            
+            if (recordTimerInterval) {
+                clearInterval(recordTimerInterval);
             }
             
-            setupEventListeners() {
-                this.userNameInput.addEventListener('input', () => {
-                    this.userName = this.userNameInput.value.trim() || "Utilisateur";
-                    this.updateNameDisplay();
-                    if (this.dataChannel && this.dataChannel.readyState === 'open') {
-                        this.sendUserName();
-                    }
-                });
-                
-                this.createOfferBtn.addEventListener('click', () => this.startAsInitiator());
-                this.setAnswerBtn.addEventListener('click', () => this.handleRemoteDescription());
-                this.disconnectBtn.addEventListener('click', () => this.disconnect());
-                this.sendBtn.addEventListener('click', () => this.sendMessage());
-                
-                this.messageInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.sendMessage();
-                });
-                
-                this.remoteSdp.addEventListener('input', () => {
-                    this.setAnswerBtn.disabled = !this.remoteSdp.value.trim();
-                });
-            }
+            setStatus("Enregistrement terminé", "success");
+        }
+    }
+
+    function saveRecording(blob) {
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const filename = `Radio_JunTech_${timestamp}.webm`;
+        
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.style.display = 'none';
+        
+        document.body.appendChild(a);
+        a.click();
+        
+        setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 100);
+        
+        const recording = {
+            id: Date.now(),
+            name: filename,
+            date: new Date().toISOString(),
+            size: blob.size,
+            url: url
+        };
+        
+        recordingsHistory.unshift(recording);
+        
+        if (recordingsHistory.length > 20) {
+            recordingsHistory = recordingsHistory.slice(0, 20);
+        }
+        
+        androidStorage.setItem('radio_recordings', recordingsHistory);
+        updateRecordingsList();
+        
+        setStatus(`Enregistrement sauvegardé: ${filename}`, "success");
+    }
+
+    function updateRecordingsList() {
+        recordingsList.innerHTML = '';
+        
+        if (recordingsHistory.length === 0) {
+            recordingsList.innerHTML = '<div class="recording-item">Aucun enregistrement</div>';
+            return;
+        }
+        
+        recordingsHistory.forEach(recording => {
+            const recordingItem = document.createElement('div');
+            recordingItem.className = 'recording-item';
             
-            waitForIceGathering() {
-                return new Promise((resolve) => {
-                    if (this.peerConnection.iceGatheringState === 'complete') {
-                        resolve();
-                        return;
-                    }
-                    
-                    const checkState = () => {
-                        if (this.peerConnection.iceGatheringState === 'complete') {
-                            this.peerConnection.removeEventListener('icegatheringstatechange', checkState);
-                            resolve();
-                        }
-                    };
-                    
-                    this.peerConnection.addEventListener('icegatheringstatechange', checkState);
-                    
-                    // Timeout de sécurité
-                    setTimeout(() => {
-                        this.peerConnection.removeEventListener('icegatheringstatechange', checkState);
-                        resolve();
-                    }, 4000);
-                });
-            }
+            const fileSize = (recording.size / (1024 * 1024)).toFixed(2);
+            const date = new Date(recording.date).toLocaleString();
             
-            async startAsInitiator() {
-                try {
-                    this.logDebug('🚀 Début création offre...', 'info');
-                    this.isInitiator = true;
-                    this.updateStatus('connecting', 'Création offre...');
-                    
-                    this.peerConnection = new RTCPeerConnection(this.configuration);
-                    this.setupConnectionListeners();
-                    
-                    // Créer le canal de données
-                    this.dataChannel = this.peerConnection.createDataChannel('chat', {
-                        ordered: true,
-                        maxPacketLifeTime: 3000
+            recordingItem.innerHTML = `
+                <div class="recording-info">
+                    <div class="recording-name">${recording.name}</div>
+                    <div class="recording-date">${date} • ${fileSize} MB</div>
+                </div>
+                <div class="recording-actions">
+                    <button class="action-icon" title="Télécharger à nouveau" onclick="downloadRecording('${recording.id}')">📥</button>
+                    <button class="action-icon" title="Partager" onclick="shareRecording('${recording.id}')">↗</button>
+                    <button class="action-icon" title="Supprimer" onclick="deleteRecording('${recording.id}')">🗑</button>
+                </div>
+            `;
+            
+            recordingsList.appendChild(recordingItem);
+        });
+    }
+
+    function downloadRecording(recordingId) {
+        const recording = recordingsHistory.find(r => r.id == recordingId);
+        if (recording) {
+            const a = document.createElement('a');
+            a.href = recording.url;
+            a.download = recording.name;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+            }, 100);
+            setStatus("Téléchargement démarré", "success");
+        }
+    }
+
+    async function shareRecording(recordingId) {
+        const recording = recordingsHistory.find(r => r.id == recordingId);
+        if (recording && recording.url) {
+            try {
+                const response = await fetch(recording.url);
+                const blob = await response.blob();
+                const file = new File([blob], recording.name, { type: 'audio/webm' });
+                
+                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        title: 'Enregistrement Radio JunTech',
+                        text: `Enregistrement du ${new Date(recording.date).toLocaleString()}`,
+                        files: [file]
                     });
-                    this.setupDataChannel(this.dataChannel);
-                    
-                    this.logDebug('📨 Canal de données créé', 'success');
-                    
-                    const offer = await this.peerConnection.createOffer();
-                    await this.peerConnection.setLocalDescription(offer);
-                    
-                    // Attendre la collecte des candidats ICE
-                    this.logDebug('⏳ Collecte des candidats ICE...', 'info');
-                    await this.waitForIceGathering();
-                    
-                    this.localSdp.value = JSON.stringify(this.peerConnection.localDescription);
-                    this.createOfferBtn.disabled = true;
-                    
-                    this.logDebug('✅ Offre créée avec succès !', 'success');
-                    this.addSystemMessage('✅ Offre créée ! Copiez le texte ci-dessus et envoyez-le à votre correspondant.');
-                    
-                } catch (error) {
-                    this.logDebug(`❌ Erreur création offre: ${error.message}`, 'error');
-                    this.addSystemMessage('❌ Erreur lors de la création de l\'offre');
+                    setStatus("Enregistrement partagé avec succès", "success");
+                } else {
+                    navigator.clipboard.writeText(`Enregistrement Radio: ${recording.name}`).then(() => {
+                        setStatus("Lien copié dans le presse-papier", "success");
+                    });
                 }
+            } catch (error) {
+                console.error('Erreur partage:', error);
+                setStatus("Erreur lors du partage", "error");
             }
+        }
+    }
+
+    function deleteRecording(recordingId) {
+        if (confirm("Voulez-vous vraiment supprimer cet enregistrement ?")) {
+            recordingsHistory = recordingsHistory.filter(r => r.id != recordingId);
+            androidStorage.setItem('radio_recordings', recordingsHistory);
+            updateRecordingsList();
+            setStatus("Enregistrement supprimé", "success");
+        }
+    }
+
+    function updateRecordTimer() {
+        if (!recordingStartTime) return;
+        
+        const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+        const minutes = Math.floor(elapsed / 60);
+        const seconds = elapsed % 60;
+        
+        recordTimer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    // --- FONCTIONNALITÉS DE MASQUAGE ---
+    function toggleSection(section, toggleBtn, storageKey) {
+        if (section.classList.contains('collapsed')) {
+            section.classList.remove('collapsed');
+            toggleBtn.textContent = 'Masquer';
+            androidStorage.setItem(storageKey, true);
+        } else {
+            section.classList.add('collapsed');
+            toggleBtn.textContent = 'Afficher';
+            androidStorage.setItem(storageKey, false);
+        }
+    }
+
+    // --- FONCTIONS RADIO ---
+    function updateStationInfo(stationData) {
+        if (stationData && stationData.name) {
+            stationNameText.textContent = stationData.name;
+            stationDescription.textContent = stationData.description;
+        }
+    }
+
+    function startMetadataPolling() {
+        if (metadataInterval) {
+            clearInterval(metadataInterval);
+        }
+        
+        metadataInterval = setInterval(async () => {
+            if (!audio.src || audio.paused) return;
             
-            async handleRemoteDescription() {
+            try {
+                // Récupération des métadonnées Icecast
+                await fetchIcecastMetadata();
+            } catch (error) {
+                console.log("Impossible de récupérer les métadonnées Icecast:", error);
+                // Tentative de récupération via l'API Shoutcast
                 try {
-                    if (this.remoteSdpProcessed) {
-                        this.logDebug('⚠️ Description déjà traitée', 'info');
-                        return;
-                    }
-                    
-                    const remoteSdp = JSON.parse(this.remoteSdp.value);
-                    this.logDebug(`📨 Réception description: ${remoteSdp.type}`, 'info');
-                    this.remoteSdpProcessed = true;
-                    
-                    if (!this.peerConnection) {
-                        // Nous sommes le répondant
-                        this.isInitiator = false;
-                        this.peerConnection = new RTCPeerConnection(this.configuration);
-                        this.setupConnectionListeners();
-                        
-                        // Configurer l'écoute des canaux de données entrants
-                        this.peerConnection.ondatachannel = (event) => {
-                            this.logDebug('🎯 Canal de données entrant détecté', 'success');
-                            this.dataChannel = event.channel;
-                            this.setupDataChannel(this.dataChannel);
-                        };
-                    }
-                    
-                    await this.peerConnection.setRemoteDescription(remoteSdp);
-                    this.logDebug('✅ Description distante appliquée', 'success');
-                    
-                    if (remoteSdp.type === 'offer') {
-                        // Créer une réponse
-                        const answer = await this.peerConnection.createAnswer();
-                        await this.peerConnection.setLocalDescription(answer);
-                        
-                        // Attendre la collecte des candidats ICE
-                        await this.waitForIceGathering();
-                        
-                        this.localSdp.value = JSON.stringify(this.peerConnection.localDescription);
-                        this.logDebug('✅ Réponse créée avec succès !', 'success');
-                        this.addSystemMessage('✅ Réponse créée ! Copiez ce texte et envoyez-le à votre correspondant.');
-                    } else {
-                        this.logDebug('✅ Traitement de la réponse...', 'success');
-                        this.addSystemMessage('✅ Réponse acceptée ! Connexion en cours...');
-                    }
-                    
-                    this.setAnswerBtn.disabled = true;
-                    
-                } catch (error) {
-                    this.logDebug(`❌ Erreur traitement SDP: ${error.message}`, 'error');
-                    this.addSystemMessage('❌ Erreur lors du traitement de la description');
-                    this.remoteSdpProcessed = false;
+                    await fetchShoutcastMetadata();
+                } catch (error2) {
+                    console.log("Impossible de récupérer les métadonnées Shoutcast:", error2);
+                    // Métadonnées par défaut si impossible de récupérer
+                    updateTrackInfo("Radio JunTech - Musique en continu", "JunTech Electronics");
                 }
             }
+        }, 10000);
+    }
+
+    async function fetchIcecastMetadata() {
+        try {
+            const statusUrl = DEFAULT_RADIO_URL.replace('/stream', '/status-json.xsl');
+            const response = await fetch(statusUrl);
             
-            setupConnectionListeners() {
-                this.peerConnection.onicecandidate = (event) => {
-                    if (event.candidate) {
-                        this.logDebug('❄️ Candidat ICE généré', 'info');
-                    }
-                };
-                
-                this.peerConnection.onconnectionstatechange = () => {
-                    const state = this.peerConnection.connectionState;
-                    this.logDebug(`🔗 État connexion: ${state}`, 'info');
-                    
-                    switch (state) {
-                        case 'connected':
-                            this.updateStatus('connected', 'Connecté P2P !');
-                            this.logDebug('🎉 CONNEXION RÉUSSIE !', 'success');
-                            break;
-                        case 'disconnected':
-                        case 'failed':
-                            this.updateStatus('disconnected', 'Déconnecté');
-                            this.enableChat(false);
-                            break;
-                        case 'connecting':
-                            this.updateStatus('connecting', 'Connexion en cours...');
-                            break;
-                    }
-                };
+            if (response.ok) {
+                const data = await response.json();
+                updateTrackInfoFromIcecast(data);
+                return true;
             }
+        } catch (error) {
+            throw error;
+        }
+        return false;
+    }
+
+    async function fetchShoutcastMetadata() {
+        try {
+            // Tentative de récupération des métadonnées Shoutcast
+            const response = await fetch(DEFAULT_RADIO_URL, { method: 'GET' });
+            const headers = response.headers;
             
-            setupDataChannel(channel) {
-                this.logDebug(`📊 Configuration canal: état ${channel.readyState}`, 'info');
+            // Vérifier les en-têtes typiques de Shoutcast
+            const icyName = headers.get('icy-name');
+            const icyDescription = headers.get('icy-description');
+            const icyGenre = headers.get('icy-genre');
+            
+            if (icyName) {
+                updateStationInfo({
+                    name: icyName,
+                    description: icyDescription || "Station radio en ligne",
+                    genre: icyGenre || "Divers"
+                });
                 
-                channel.onopen = () => {
-                    this.logDebug('✅ CANAL DE DONNÉES OUVERT !', 'success');
-                    this.addSystemMessage('🎉 Canal de communication établi ! Vous pouvez maintenant chatter.');
-                    this.enableChat(true);
-                    
-                    // Échanger les noms dès que le canal est ouvert
-                    setTimeout(() => {
-                        this.sendUserName();
-                    }, 500);
-                };
-                
-                channel.onclose = () => {
-                    this.logDebug('❌ Canal de données fermé', 'error');
-                    this.addSystemMessage('📵 Canal de communication fermé.');
-                    this.enableChat(false);
-                    this.nameExchanged = false;
-                    this.remoteUserName = "Correspondant";
-                    this.updateNameDisplay();
-                };
-                
-                channel.onmessage = (event) => {
-                    try {
-                        const data = JSON.parse(event.data);
-                        if (data.type === 'userName') {
-                            this.remoteUserName = data.name;
-                            this.remoteUserNameInput.value = this.remoteUserName;
-                            this.updateNameDisplay();
-                            this.logDebug(`📝 Nom reçu: ${this.remoteUserName}`, 'success');
-                            if (!this.nameExchanged) {
-                                this.addSystemMessage(`👋 Connecté avec ${this.remoteUserName}`);
-                                this.nameExchanged = true;
-                            }
-                        } else if (data.type === 'message') {
-                            this.logDebug(`📩 Message reçu de ${this.remoteUserName}: ${data.content}`, 'info');
-                            this.addMessage(this.remoteUserName, data.content, 'received');
-                        }
-                    } catch (error) {
-                        // Si le message n'est pas du JSON, c'est un message texte simple
-                        this.logDebug(`📩 Message reçu de ${this.remoteUserName}: ${event.data}`, 'info');
-                        this.addMessage(this.remoteUserName, event.data, 'received');
-                    }
-                };
+                // Pour Shoutcast, les métadonnées de titre sont généralement dans le flux
+                // On ne peut pas les récupérer facilement via HTTP
+                updateTrackInfo("Lecture en cours", icyName);
+                return true;
             }
-            
-            sendUserName() {
-                if (this.dataChannel && this.dataChannel.readyState === 'open') {
-                    const nameData = {
-                        type: 'userName',
-                        name: this.userName
-                    };
-                    this.dataChannel.send(JSON.stringify(nameData));
-                    this.logDebug(`📤 Nom envoyé: ${this.userName}`, 'info');
-                }
-            }
-            
-            sendMessage() {
-                const message = this.messageInput.value.trim();
+        } catch (error) {
+            throw error;
+        }
+        return false;
+    }
+
+    function updateTrackInfoFromIcecast(icecastData) {
+        try {
+            if (icecastData && icecastData.icestats && icecastData.icestats.source) {
+                const source = icecastData.icestats.source;
                 
-                if (!message) return;
-                
-                if (this.dataChannel && this.dataChannel.readyState === 'open') {
-                    try {
-                        // Envoyer le message avec métadonnées
-                        const messageData = {
-                            type: 'message',
-                            content: message
-                        };
-                        this.dataChannel.send(JSON.stringify(messageData));
-                        
-                        this.addMessage(this.userName, message, 'sent');
-                        this.messageInput.value = '';
-                        this.logDebug(`📤 Message envoyé: "${message}"`, 'info');
-                    } catch (error) {
-                        this.logDebug(`❌ Erreur envoi message: ${error}`, 'error');
-                        this.addSystemMessage('❌ Erreur lors de l\'envoi du message');
-                    }
-                } else {
-                    this.logDebug('❌ Impossible d\'envoyer - canal fermé', 'error');
-                    this.addSystemMessage('❌ Canal non disponible pour l\'envoi');
-                }
-            }
-            
-            updateNameDisplay() {
-                if (this.remoteUserName && this.remoteUserName !== "Correspondant") {
-                    this.nameDisplay.textContent = `💬 Chat avec : ${this.remoteUserName}`;
-                    this.nameDisplay.style.background = '#28a745';
-                } else {
-                    this.nameDisplay.textContent = '⏳ En attente de connexion...';
-                    this.nameDisplay.style.background = '#4a00e0';
-                }
-            }
-            
-            enableChat(enabled) {
-                this.messageInput.disabled = !enabled;
-                this.sendBtn.disabled = !enabled;
-                this.disconnectBtn.disabled = !enabled;
-                
-                if (enabled) {
-                    this.messageInput.placeholder = "Tapez votre message...";
-                    this.messageInput.focus();
-                    this.logDebug('💬 CHAT ACTIVÉ - Prêt à envoyer des messages !', 'success');
-                } else {
-                    this.messageInput.placeholder = "Connectez-vous d'abord...";
-                }
-            }
-            
-            addMessage(sender, message, type) {
-                const messageElement = document.createElement('div');
-                messageElement.className = `message message-${type}`;
-                messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
-                
-                this.messagesContainer.appendChild(messageElement);
-                this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
-            }
-            
-            addSystemMessage(message) {
-                const messageElement = document.createElement('div');
-                messageElement.className = 'message message-system';
-                messageElement.textContent = message;
-                
-                this.messagesContainer.appendChild(messageElement);
-                this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
-            }
-            
-            updateStatus(status, text) {
-                this.statusText.textContent = text;
-                
-                this.statusDot.className = 'status-dot';
-                switch (status) {
-                    case 'connected':
-                        this.statusDot.classList.add('status-connected');
-                        break;
-                    case 'connecting':
-                        this.statusDot.classList.add('status-connecting');
-                        break;
-                    case 'disconnected':
-                        this.statusDot.classList.add('status-disconnected');
-                        break;
-                }
-            }
-            
-            logDebug(message, type = 'info') {
-                const timestamp = new Date().toLocaleTimeString();
-                const div = document.createElement('div');
-                div.className = `debug-item debug-${type}`;
-                div.textContent = `[${timestamp}] ${message}`;
-                this.debugPanel.appendChild(div);
-                this.debugPanel.scrollTop = this.debugPanel.scrollHeight;
-                
-                console.log(`[WebRTC-GitHub] ${message}`);
-            }
-            
-            disconnect() {
-                if (this.dataChannel) {
-                    this.dataChannel.close();
+                // Mettre à jour le nom de la station
+                if (source.server_name) {
+                    updateStationInfo({
+                        name: source.server_name,
+                        description: source.server_description || "Station radio en ligne",
+                        genre: source.genre || "Divers"
+                    });
                 }
                 
-                if (this.peerConnection) {
-                    this.peerConnection.close();
-                }
+                // Mettre à jour les informations de piste
+                let title = source.title || "Radio JunTech - Musique en continu";
+                let artist = source.artist || "JunTech Electronics";
                 
-                this.peerConnection = null;
-                this.dataChannel = null;
-                this.isInitiator = false;
-                this.remoteSdpProcessed = false;
-                this.nameExchanged = false;
-                this.remoteUserName = "Correspondant";
-                this.remoteUserNameInput.value = "";
-                this.updateNameDisplay();
+                updateTrackInfo(title, artist);
+            }
+        } catch (error) {
+            updateTrackInfo("Radio JunTech - Musique en continu", "JunTech Electronics");
+        }
+    }
+
+    function updateTrackInfo(title, artist = '') {
+        currentMetadata = { title, artist };
+        
+        trackTitle.textContent = title;
+        trackArtist.textContent = artist;
+        
+        trackArtist.style.display = artist ? 'block' : 'none';
+    }
+
+    function setStatus(text, type = "normal") {
+        statusText.textContent = text;
+        statusPill.textContent = text;
+
+        statusPill.classList.remove("live", "error", "warning", "success");
+        if (type === "live") statusPill.classList.add("live");
+        if (type === "error") statusPill.classList.add("error");
+        if (type === "warning") statusPill.classList.add("warning");
+        if (type === "success") statusPill.classList.add("success");
+    }
+
+    function togglePlay() {
+        if (!audio.src) {
+            setStatus("Aucune source audio configurée", "error");
+            return;
+        }
+        
+        if (audio.paused) {
+            audio.play().then(() => {
+                setStatus("Lecture en cours - Radio JunTech", "live");
+                playBtn.textContent = "❚❚";
+                initAudioContext();
+                startVisualizer();
+                updateConnectionStats();
                 
-                this.updateStatus('disconnected', 'Déconnecté');
-                this.enableChat(false);
-                this.createOfferBtn.disabled = false;
-                this.setAnswerBtn.disabled = true;
-                
-                this.logDebug('🔌 Déconnexion effectuée', 'info');
-                this.addSystemMessage('🔌 Connexion terminée.');
+                // Tentative de récupération immédiate des métadonnées
+                setTimeout(() => {
+                    fetchIcecastMetadata().catch(() => {
+                        fetchShoutcastMetadata().catch(() => {
+                            console.log("Utilisation des métadonnées par défaut");
+                        });
+                    });
+                }, 1000);
+            }).catch(e => {
+                console.error("Erreur de lecture:", e);
+                setStatus("Erreur de connexion à Radio JunTech", "error");
+            });
+        } else {
+            audio.pause();
+            setStatus("Lecture en pause", "warning");
+            playBtn.textContent = "▶";
+            stopVisualizer();
+        }
+    }
+
+    function initAudioContext() {
+        if (audioCtx) return;
+        
+        try {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioCtx.createAnalyser();
+            sourceNode = audioCtx.createMediaElementSource(audio);
+            
+            analyser.fftSize = 256;
+            analyser.smoothingTimeConstant = smoothing;
+            
+            sourceNode.connect(analyser);
+            analyser.connect(audioCtx.destination);
+            
+            initEqualizer();
+        } catch (e) {
+            console.error("Erreur initialisation AudioContext:", e);
+        }
+    }
+
+    function initEqualizer() {
+        if (!audioCtx) return;
+        
+        eqNodes.forEach(node => node.disconnect());
+        eqNodes = [];
+        
+        const frequencies = [32, 64, 125, 250, 500, 1000, 2000, 4000, 8000];
+        const eqSliders = [eqSub, eqLow1, eqLow2, eqLowMid, eqMid, eqHighMid1, eqHighMid2, eqHigh1, eqHigh2];
+        
+        let lastNode = sourceNode;
+        
+        frequencies.forEach((freq, index) => {
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = "peaking";
+            filter.frequency.value = freq;
+            filter.Q.value = 1;
+            filter.gain.value = parseFloat(eqSliders[index].value);
+            
+            lastNode.connect(filter);
+            lastNode = filter;
+            eqNodes.push(filter);
+        });
+        
+        lastNode.connect(analyser);
+    }
+
+    function updateEqualizer() {
+        if (!eqNodes.length) return;
+        
+        const eqSliders = [eqSub, eqLow1, eqLow2, eqLowMid, eqMid, eqHighMid1, eqHighMid2, eqHigh1, eqHigh2];
+        
+        eqSliders.forEach((slider, index) => {
+            if (eqNodes[index]) {
+                eqNodes[index].gain.value = parseFloat(slider.value);
+            }
+        });
+        
+        updateEqValues();
+    }
+
+    function updateEqValues() {
+        eqSubValue.textContent = `${eqSub.value}dB`;
+        eqLow1Value.textContent = `${eqLow1.value}dB`;
+        eqLow2Value.textContent = `${eqLow2.value}dB`;
+        eqLowMidValue.textContent = `${eqLowMid.value}dB`;
+        eqMidValue.textContent = `${eqMid.value}dB`;
+        eqHighMid1Value.textContent = `${eqHighMid1.value}dB`;
+        eqHighMid2Value.textContent = `${eqHighMid2.value}dB`;
+        eqHigh1Value.textContent = `${eqHigh1.value}dB`;
+        eqHigh2Value.textContent = `${eqHigh2.value}dB`;
+    }
+
+    function applyPreset(preset) {
+        const presets = {
+            flat: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            bass: [6, 4, 2, 0, -1, -2, -2, -2, -2],
+            treble: [-2, -2, -2, -2, -1, 0, 2, 4, 6],
+            vocal: [-2, -1, 0, 1, 2, 3, 2, 1, 0],
+            rock: [4, 3, 2, 0, 0, 0, 2, 3, 4],
+            jazz: [2, 1, 0, 0, 0, 0, 0, 1, 2],
+            classical: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            electronic: [4, 3, 2, 0, -1, 0, 2, 3, 4]
+        };
+        
+        const values = presets[preset] || presets.flat;
+        const eqSliders = [eqSub, eqLow1, eqLow2, eqLowMid, eqMid, eqHighMid1, eqHighMid2, eqHigh1, eqHigh2];
+        
+        eqSliders.forEach((slider, index) => {
+            slider.value = values[index];
+        });
+        
+        updateEqualizer();
+        
+        presetButtons.forEach(btn => {
+            if (btn.dataset.preset === preset) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+
+    function startVisualizer() {
+        if (!analyser) return;
+        
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        const timeDataArray = new Uint8Array(bufferLength);
+        
+        function draw() {
+            animationId = requestAnimationFrame(draw);
+            
+            analyser.getByteFrequencyData(dataArray);
+            analyser.getByteTimeDomainData(timeDataArray);
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            switch(vizType) {
+                case 'bars':
+                    drawBars(dataArray, bufferLength);
+                    break;
+                case 'wave':
+                    drawWave(timeDataArray, bufferLength);
+                    break;
+                case 'circle':
+                    drawCircle(dataArray, bufferLength);
+                    break;
+                case 'spectrum':
+                    drawSpectrum(dataArray, bufferLength);
+                    break;
             }
         }
         
-        // Démarrer l'application
-        document.addEventListener('DOMContentLoaded', () => {
-            window.chatApp = new WebRTCChat();
+        draw();
+    }
+
+    function stopVisualizer() {
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+        }
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function drawBars(dataArray, bufferLength) {
+        const barWidth = (canvas.width / bufferLength) * 2.5;
+        let barHeight;
+        let x = 0;
+        
+        for(let i = 0; i < bufferLength; i++) {
+            barHeight = (dataArray[i] / 255) * canvas.height;
+            
+            const intensity = dataArray[i] / 255;
+            const hue = 200 + (intensity * 160);
+            ctx.fillStyle = `hsl(${hue}, 100%, ${50 + intensity * 25}%)`;
+            ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+            
+            x += barWidth + 1;
+        }
+    }
+
+    function drawWave(timeDataArray, bufferLength) {
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#00a884';
+        ctx.beginPath();
+        
+        const sliceWidth = canvas.width / bufferLength;
+        let x = 0;
+        
+        wavePhase += 0.05;
+        
+        for(let i = 0; i < bufferLength; i++) {
+            const v = timeDataArray[i] / 128.0;
+            const y = (v * canvas.height / 2) + Math.sin(x * 0.01 + wavePhase) * 5;
+            
+            if(i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+            
+            x += sliceWidth;
+        }
+        
+        ctx.stroke();
+        
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = '#00a884';
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+    }
+
+    function drawCircle(dataArray, bufferLength) {
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const radius = Math.min(centerX, centerY) * 0.6;
+        
+        ctx.beginPath();
+        
+        for(let i = 0; i < bufferLength; i++) {
+            const angle = (i * 2 * Math.PI) / bufferLength;
+            const value = dataArray[i] / 255;
+            const pointRadius = value * radius * 0.8;
+            
+            const x = centerX + Math.cos(angle) * (radius + pointRadius);
+            const y = centerY + Math.sin(angle) * (radius + pointRadius);
+            
+            if(i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        }
+        
+        ctx.closePath();
+        ctx.strokeStyle = '#00a884';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+        gradient.addColorStop(0, 'rgba(0, 168, 132, 0.3)');
+        gradient.addColorStop(1, 'rgba(0, 168, 132, 0.1)');
+        ctx.fillStyle = gradient;
+        ctx.fill();
+    }
+
+    function drawSpectrum(dataArray, bufferLength) {
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const maxRadius = Math.min(centerX, centerY) * 0.8;
+        
+        for (let i = 0; i < bufferLength; i += 2) {
+            const value = dataArray[i] / 255;
+            const angle = (i * 2 * Math.PI) / bufferLength;
+            const barHeight = value * maxRadius * 0.5;
+            const barWidth = 2;
+            
+            const x1 = centerX + Math.cos(angle) * maxRadius;
+            const y1 = centerY + Math.sin(angle) * maxRadius;
+            const x2 = centerX + Math.cos(angle) * (maxRadius + barHeight);
+            const y2 = centerY + Math.sin(angle) * (maxRadius + barHeight);
+            
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.lineWidth = barWidth;
+            
+            const hue = i / bufferLength * 360;
+            ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+            ctx.stroke();
+        }
+    }
+
+    function updateConnectionStats() {
+        if (!audio.src || audio.paused) return;
+        
+        const bitrate = 128 + Math.floor(Math.random() * 64);
+        const bufferHealth = Math.max(0, Math.min(100, 100 - (audio.buffered.length ? 0 : 50)));
+        const listeners = 50 + Math.floor(Math.random() * 150);
+        
+        bitrateStat.textContent = `Bitrate: ${bitrate} kbps`;
+        bufferStat.textContent = `Buffer: ${bufferHealth}%`;
+        qualityStat.textContent = `Qualité: Excellent`;
+        listenersCount.textContent = `👥 ${listeners}`;
+        bitrateDisplay.textContent = `${bitrate} kbps`;
+    }
+
+    function startSleepTimer(minutes) {
+        if (sleepTimer) {
+            clearTimeout(sleepTimer);
+        }
+        
+        const milliseconds = minutes * 60 * 1000;
+        sleepTimer = setTimeout(() => {
+            audio.pause();
+            setStatus("Minuterie - Lecture arrêtée", "warning");
+            sleepTimerDisplay.textContent = "Terminée";
+            alert(`Minuterie de veille: La lecture a été arrêtée après ${minutes} minutes.`);
+        }, milliseconds);
+        
+        const endTime = new Date(Date.now() + milliseconds);
+        sleepTimerDisplay.textContent = `Active - ${endTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+        
+        sleepTimerBtns.forEach(btn => {
+            if (parseInt(btn.dataset.minutes) === minutes) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
         });
-    </script>
+    }
+
+    function stopSleepTimerFunc() {
+        if (sleepTimer) {
+            clearTimeout(sleepTimer);
+            sleepTimer = null;
+        }
+        sleepTimerDisplay.textContent = "Désactivée";
+        sleepTimerBtns.forEach(btn => btn.classList.remove('active'));
+    }
+
+    function toggleMute() {
+        if (isMuted) {
+            audio.volume = originalVolume;
+            volumeSlider.value = originalVolume;
+            volumeValue.textContent = Math.round(originalVolume * 100) + '%';
+            muteBtn.innerHTML = '<span>🔇</span> Mute';
+            setStatus("Son rétabli", "success");
+        } else {
+            originalVolume = audio.volume;
+            audio.volume = 0;
+            volumeSlider.value = 0;
+            volumeValue.textContent = '0%';
+            muteBtn.innerHTML = '<span>🔊</span> Unmute';
+            setStatus("Son coupé", "warning");
+        }
+        isMuted = !isMuted;
+    }
+
+    function toggleBassBoost() {
+        isBassBoost = !isBassBoost;
+        
+        if (isBassBoost) {
+            eqSub.value = 8;
+            eqLow1.value = 6;
+            eqLow2.value = 4;
+            boostBtn.classList.add('active');
+            setStatus("Boost des basses activé", "success");
+        } else {
+            eqSub.value = 0;
+            eqLow1.value = 0;
+            eqLow2.value = 0;
+            boostBtn.classList.remove('active');
+            setStatus("Boost des basses désactivé", "normal");
+        }
+        updateEqualizer();
+    }
+
+    function restartStream() {
+        if (!audio.src) return;
+        
+        const wasPlaying = !audio.paused;
+        const currentSrc = audio.src;
+        
+        audio.pause();
+        audio.src = '';
+        audio.src = currentSrc;
+        
+        if (wasPlaying) {
+            audio.play().catch(console.error);
+        }
+        
+        setStatus("Flux redémarré", "success");
+    }
+
+    // Ajuster la taille du canvas
+    function resizeCanvas() {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        
+        ctx.scale(dpr, dpr);
+        canvas.style.width = `${rect.width}px`;
+        canvas.style.height = `${rect.height}px`;
+    }
+
+    // Initialisation au chargement
+    document.addEventListener('DOMContentLoaded', function() {
+        // Redimensionner le canvas
+        resizeCanvas();
+        
+        // Vérifier l'état des sections masquées
+        const isEqVisible = androidStorage.getItem('radio_eq_visible') !== false;
+        const isRecordingVisible = androidStorage.getItem('radio_recording_visible') !== false;
+        const isSleepTimerVisible = androidStorage.getItem('radio_sleep_timer_visible') !== false;
+
+        if (!isEqVisible) {
+            equalizerBlock.classList.add('collapsed');
+            eqToggle.textContent = 'Afficher';
+        }
+        if (!isRecordingVisible) {
+            recordingBlock.classList.add('collapsed');
+            recordingToggle.textContent = 'Afficher';
+        }
+        if (!isSleepTimerVisible) {
+            sleepTimerBlock.classList.add('collapsed');
+            sleepTimerToggle.textContent = 'Afficher';
+        }
+
+        // Initialiser la radio
+        initializeRadio();
+        updateRecordingsList();
+        
+        // Initialiser les valeurs
+        volumeValue.textContent = Math.round(volumeSlider.value * 100) + '%';
+        presetButtons[0].classList.add('active');
+        updateEqValues();
+    });
+
+    // Événements
+    playBtn.addEventListener('click', togglePlay);
+
+    volumeSlider.addEventListener('input', () => {
+        audio.volume = volumeSlider.value;
+        volumeValue.textContent = Math.round(volumeSlider.value * 100) + '%';
+    });
+
+    vizButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            vizButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            vizType = btn.dataset.viz;
+        });
+    });
+
+    recordBtn.addEventListener('click', function() {
+        if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+            startRecording();
+        } else {
+            stopRecording();
+        }
+    });
+
+    eqToggle.addEventListener('click', () => {
+        toggleSection(equalizerBlock, eqToggle, 'radio_eq_visible');
+    });
+
+    recordingToggle.addEventListener('click', () => {
+        toggleSection(recordingBlock, recordingToggle, 'radio_recording_visible');
+    });
+
+    sleepTimerToggle.addEventListener('click', () => {
+        toggleSection(sleepTimerBlock, sleepTimerToggle, 'radio_sleep_timer_visible');
+    });
+
+    recordingsBtn.addEventListener('click', () => {
+        updateRecordingsList();
+        recordingsModal.style.display = 'flex';
+    });
+
+    closeRecordings.addEventListener('click', () => {
+        recordingsModal.style.display = 'none';
+    });
+
+    muteBtn.addEventListener('click', toggleMute);
+    replayBtn.addEventListener('click', restartStream);
+    boostBtn.addEventListener('click', toggleBassBoost);
+
+    sleepTimerBtns.forEach(btn => {
+        if (btn.id !== 'stopSleepTimer') {
+            btn.addEventListener('click', () => {
+                startSleepTimer(parseInt(btn.dataset.minutes));
+            });
+        }
+    });
+
+    stopSleepTimer.addEventListener('click', stopSleepTimerFunc);
+
+    // Événements égaliseur
+    const eqSliders = [eqSub, eqLow1, eqLow2, eqLowMid, eqMid, eqHighMid1, eqHighMid2, eqHigh1, eqHigh2];
+    eqSliders.forEach(slider => {
+        slider.addEventListener('input', () => {
+            updateEqualizer();
+        });
+    });
+
+    presetButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            applyPreset(btn.dataset.preset);
+        });
+    });
+
+    // Événements audio
+    audio.addEventListener('loadstart', () => {
+        setStatus("Chargement du flux Radio JunTech...", "warning");
+    });
+
+    audio.addEventListener('canplay', () => {
+        setStatus("Radio JunTech prête à écouter", "success");
+    });
+
+    audio.addEventListener('playing', () => {
+        setStatus("Lecture en cours - Radio JunTech", "live");
+    });
+
+    audio.addEventListener('error', (e) => {
+        console.error("Erreur audio:", e);
+        setStatus("Erreur de connexion à Radio JunTech", "error");
+    });
+
+    audio.addEventListener('waiting', () => {
+        setStatus("Mise en mémoire tampon...", "warning");
+    });
+
+    // Redimensionnement du canvas
+    window.addEventListener('resize', resizeCanvas);
+
+    // Mettre à jour les statistiques périodiquement
+    setInterval(updateConnectionStats, 5000);
+</script>
+
 </body>
 </html>
